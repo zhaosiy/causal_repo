@@ -164,19 +164,19 @@ class RNNDecoder(nn.Module):
 
         return pred, hidden
 
-    def forward(self, inputs, timestep, newnodes, rel_rec, rel_send, pred_steps=1,
+    def forward(self, encoderr,inputs, timestep, rel_rec, rel_send, pred_steps=1,
                 burn_in=False, burn_in_steps=1, dynamic_graph=False,
                 encoder=None, temp=None):
         inputs = inputs.transpose(1, 2).contiguous()[:,:,:,:2]
-
-        hidden = newnodes
         pred_all = []
         ins = inputs[:, 0, :, :]
-        for step in range(0, timestep):
+        for step in range(0, 19):
 
             if step > 0:
-                ins = pred_all[step - 1]
-
+                #ins = pred_all[step - 1]
+                 ins = inputs[:, len(pred_all), :, :]
+            updated_nodes = encoderr(ins, rel_rec, rel_send) 
+            hidden = updated_nodes
             pred, hidden = self.single_step_forward(ins, rel_rec, rel_send, hidden)
             pred_all.append(pred)
 
